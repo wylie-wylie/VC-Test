@@ -1,0 +1,90 @@
+import requests
+import pandas as pd
+import json
+
+# 1. API Configuration
+API_KEY = "YOUR_CRUNCHBASE_API_KEY"
+HEADERS = {
+    "X-cb-user-key": API_KEY,
+    "Content-Type": "application/json"
+}
+URL = "https://api.crunchbase.com/api/v4/searches/organizations"
+
+# 2. Build the Advanced Filtering Query
+# We are filtering for organizations that ARE investors AND match our deep tech categories
+query_payload = {
+    "field_ids": [
+        "name",
+        "website_url",
+        "linkedin",
+        "categories",
+        "investor_stage",
+        "description"
+    ],
+    "order_ids": [
+        {"field_id": "rank", "sort": "asc"}
+    ],
+    "query": [
+        {
+            "type": "predicate",
+            "field_id": "facet_ids",
+            "operator_id": "includes",
+            "values": ["investor"] # Restricts search only to funding entities
+        },
+        {
+            "type": "predicate",
+            "field_id": "categories",
+            "operator_id": "includes",
+            "values": [
+                "advanced_materials", 
+                "chemical", 
+                "artificial_intelligence", 
+                "sustainability"
+            ]
+        }
+    ],
+    "limit": 50
+}
+
+print("Querying Crunchbase for Deep Tech & Materials Science Investors...")
+response = requests.post(URL, headers=HEADERS, json=query_payload)
+
+if response.status_code == 200:
+    results = response.json().get("entities", [])
+    print(f"Found {len(results)} potential investors matching criteria.")
+    
+    # 3. Process data into your exact Excel header format
+    vc_list = []
+    for entity in results:
+        props = entity.get("properties", {})
+        
+        # Format categories array into a clean comma-separated string
+        categories_raw = props.get("categories", [])
+        categories_list = [c.get("value") for c in categories_raw] if categories_raw else []
+        sector_focus = ", ".join(categories_list)
+        
+        # Build row to match your Excel structure exactly
+        vc_row = {
+            "Firm Name": props.get("name"),
+            "Target Partner": "",  # To be filled during contact enrichment
+            "Crunchbase": f"https://www.crunchbase.com/organization/{entity.get('uuid')}",
+            "Angel List": "",
+            "Linkedin": props.get("linkedin", {}).get("value", ""),
+            "Contact Information": props.get("website_url", {}).get("value", ""),
+            "Amount Raise": "",    # Your target raise amount
+            "Date": "",
+            "Sector Focus": sector_focus,
+            "Check Size": ", ".join(props.get("investor_stage", [])),
+            "Priority": 3,         # Default neutral priority
+            "Status": "Researching",
+            "Comments": props.get("description", "")
+        }
+        vc_list.append(vc_row)
+        
+    # 4. Export directly to your pipeline sheet
+    df = pd.DataFrame(vc_list)
+    df.to_excel("Automated_DeepTech_VC_Pipeline.xlsx", index=False)
+    print("Success! Data written to 'Automated_DeepTech_VC_Pipeline.xlsx'")
+
+else:
+    print(f"API Error {response.status_code}: {response.text}")
