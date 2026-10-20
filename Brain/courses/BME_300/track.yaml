@@ -1,0 +1,12 @@
+id: BME_300
+code: BME 300
+name: BME 300 — Design (Wound Intelligence)
+area: BME Design Project
+enabled: true
+archetype: research_engineering
+trigger: cadence
+priority: Medium
+event_pattern: "BME\\s*300"
+term_start: "2026-09-02"
+term_end: "2026-12-15"
+cadence_days: []

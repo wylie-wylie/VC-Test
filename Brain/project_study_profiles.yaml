@@ -1,0 +1,40 @@
+# Study rules injected into the Gemini menu. Matching uses area, code, and name.
+profiles:
+  - area: ANAT&PHYS 335
+    match:
+      - ANAT&PHY 335
+      - ANAT&PHYS 335
+      - ANAT 335
+    rules: |
+      Physiological cascade and mechanism mapping first.
+      High-yield Anki with image occlusion strictly restricted to anatomical structures and diagrams.
+      Never fragment pathways into cloze cards.
+  - area: BME 310 — Bioinstrumentation
+    match:
+      - BME 310
+    rules: |
+      Circuit and system derivations first.
+      Mandatory step-by-step problem-set example drills.
+  - area: EMA 303 — Mechanics of Materials
+    match:
+      - EMA 303
+    rules: |
+      Structural free-body diagrams first.
+      Mandatory step-by-step problem-set example drills.
+  - area: Wentland Lab Radiology Research
+    match:
+      - Wentland
+      - WENTLAND
+    rules: |
+      Python, MONAI, and DGX pipeline execution and milestone checks.
+  - area: BME Design Project
+    match:
+      - BME 300
+      - BME Design
+    rules: |
+      Python, MONAI, and DGX pipeline execution and milestone checks.
+  - area: MCAT Prep
+    match:
+      - MCAT
+    rules: |
+      Timed UWorld/AAMC passage blocks plus active error-log Anki synthesis.

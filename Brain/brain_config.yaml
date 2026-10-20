@@ -1,0 +1,67 @@
+timezone: America/Chicago
+term_year: 2026
+state_path: state_manifest.json
+
+discovery:
+  courses_dir: courses
+
+constraints:
+  day_end: "22:00"
+  max_deep_blocks_per_day: 2
+  event_prefix: "[Auto-Study]"
+  # Sleep (every day 00:00–07:00) and Radiology Research (Mon/Fri 08:00–12:00)
+  # are hard windows enforced by the engine. Add more windows here; they cannot
+  # remove the hard ones, and the deep-block cap cannot rise above 2.
+  protected_windows: []
+  all_day_busy_keywords:
+    - shift
+    - clinical
+    - on call
+
+inbox:
+  daily_dump: inbox/daily_task_dump.md
+  quick_add_dir: inbox/quick_add
+
+notion:
+  version: "2022-06-28"
+  token_env: NOTION_TOKEN
+  areas_db_env: NOTION_AREAS_DB
+  projects_db_env: NOTION_PROJECTS_DB
+  tasks_db_env: NOTION_TASKS_DB
+  recurring_db_env: NOTION_RECURRING_DB
+  quick_add_db_env: NOTION_QUICK_ADD_DB
+  daily_dump_page_env: NOTION_DAILY_DUMP_PAGE
+  properties:
+    title: Name
+    area: Area
+    project: Project
+    work_time: Work Time
+    priority: Priority
+    done: Done
+    archive: Archive
+    processed: Processed
+    days: Day
+
+gemini:
+  api_key_env: GEMINI_API_KEY
+
+calendar:
+  calendar_id_env: GOOGLE_CALENDAR_ID
+  ics_url_env: GOOGLE_CALENDAR_ICS_URL
+  canvas_ics_url_env: CANVAS_CALENDAR_ICS_URL
+  token_path: credentials/google_token.json
+
+tracks:
+  - id: ANAT_335
+    enabled: true
+  - id: EMA_303
+    enabled: true
+  - id: BME_310
+    enabled: true
+  - id: BME_300
+    enabled: true
+  - id: MCAT_PREP
+    enabled: true
+  - id: WENTLAND_LAB
+    enabled: true
+# end tracks

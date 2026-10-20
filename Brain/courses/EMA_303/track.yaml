@@ -1,0 +1,12 @@
+id: EMA_303
+code: EMA 303
+name: EMA 303 — Mechanics of Materials
+area: EMA 303 — Mechanics of Materials
+enabled: true
+archetype: quant_engineering
+trigger: calendar
+priority: Medium
+event_pattern: "EMA\\s*303"
+term_start: "2026-09-02"
+term_end: "2026-12-15"
+cadence_days: []

@@ -1,0 +1,12 @@
+id: BME_310
+code: BME 310
+name: BME 310 — Bioinstrumentation
+area: BME 310 — Bioinstrumentation
+enabled: true
+archetype: quant_engineering
+trigger: calendar
+priority: Medium
+event_pattern: "BME\\s*310"
+term_start: "2026-09-02"
+term_end: "2026-12-15"
+cadence_days: []

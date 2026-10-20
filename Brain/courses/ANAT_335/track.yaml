@@ -1,0 +1,12 @@
+id: ANAT_335
+code: ANAT 335
+name: ANAT&PHYS 335
+area: ANAT&PHYS 335
+enabled: true
+archetype: bio_physiology
+trigger: calendar
+priority: Medium
+event_pattern: "ANAT\\s*&?\\s*PHY[S]?\\s*335|ANAT\\s*335|Anat\\s*&?\\s*Ph(?:ys|y)\\s*335"
+term_start: "2026-09-02"
+term_end: "2026-12-14"
+cadence_days: []

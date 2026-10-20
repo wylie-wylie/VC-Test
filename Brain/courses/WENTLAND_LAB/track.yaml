@@ -1,0 +1,11 @@
+id: WENTLAND_LAB
+code: WENTLAND
+name: Wentland Lab Radiology Research
+area: Wentland Lab Radiology Research
+enabled: true
+archetype: research_engineering
+trigger: cadence
+priority: High
+cadence_days:
+  - Mon
+  - Fri

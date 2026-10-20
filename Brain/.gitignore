@@ -1,0 +1,10 @@
+.venv/
+.env
+.env.local
+__pycache__/
+.pytest_cache/
+*.pyc
+credentials/*
+!credentials/.gitkeep
+!credentials/google_token.example.json
+last_plan.json

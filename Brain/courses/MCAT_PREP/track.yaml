@@ -1,0 +1,9 @@
+id: MCAT_PREP
+code: MCAT
+name: MCAT Prep
+area: MCAT Prep
+enabled: true
+archetype: mcat_block
+trigger: cadence
+priority: High
+cadence_days: []
