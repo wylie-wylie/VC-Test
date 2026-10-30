@@ -5,11 +5,9 @@ export function MatrixView() {
     <section className="matrix-wrap">
       <header className="stage-head">
         <div>
-          <p className="eyebrow">Specification</p>
           <h1>Wound biomarker matrix</h1>
           <p className="lede">
-            What each marker means in the wound, the band this console calls expected, the band it treats as abnormal,
-            and the therapy route. The decision layer reads this table.
+            What each marker means in the wound, the expected band, the abnormal band, and the therapy route.
           </p>
         </div>
       </header>
@@ -24,7 +22,6 @@ export function MatrixView() {
               <th>Abnormal range</th>
               <th>Therapy route</th>
               <th>Image</th>
-              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -38,9 +35,6 @@ export function MatrixView() {
                 <td>{row.abnormal}</td>
                 <td>{row.therapy}</td>
                 <td>{row.image}</td>
-                <td>
-                  <span className={`tag tag-${row.status.toLowerCase()}`}>{row.status}</span>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -61,7 +55,6 @@ export function MatrixView() {
               <th>Expected</th>
               <th>Barrier signal</th>
               <th>Treatment option</th>
-              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -75,9 +68,6 @@ export function MatrixView() {
                 <td>{row.expected}</td>
                 <td>{row.barrier}</td>
                 <td>{row.treatment}</td>
-                <td>
-                  <span className={`tag tag-${row.status.toLowerCase()}`}>{row.status}</span>
-                </td>
               </tr>
             ))}
           </tbody>

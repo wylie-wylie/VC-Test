@@ -4,7 +4,7 @@ export const CLINIC_DAY = "2026-09-30"
 export const PROBE_AREA_CM2 = 1.8
 
 export const DISCLAIMER =
-  "Prototype decision support for BME 300. Synthetic patients only. Not a medical device, not a diagnosis, and not an order that executes itself. The covering clinician decides."
+  "Decision support only. Not a diagnosis, and not an order that executes itself. The covering clinician decides."
 
 export function fmtPh(n: number) {
   return n.toFixed(2)

@@ -1,8 +1,6 @@
-import { useState } from "react"
 import type { Patient } from "../types"
 import { interpret } from "../lib/clinical"
-import { CLINIC_DAY, acuityMark, deltaT, fmtDate, fmtDelta, fmtPh, fmtTemp } from "../lib/format"
-import { WoundFigure } from "./WoundFigure"
+import { CLINIC_DAY, acuityMark, deltaT, fmtDate, fmtDelta, fmtTemp, titleCase } from "../lib/format"
 
 function Spark({ values }: { values: number[] }) {
   const width = 148
@@ -27,21 +25,26 @@ function Spark({ values }: { values: number[] }) {
 export function Chart({
   patient,
   fresh,
-  hasKey,
   onAcquire,
   onGenerate,
 }: {
   patient: Patient
   fresh: boolean
-  hasKey: boolean
   onAcquire: () => void
   onGenerate: () => void
 }) {
   const reading = patient.history[patient.history.length - 1]
   const prior = patient.history[patient.history.length - 2]
   const call = interpret(reading, prior)
-  const [mode, setMode] = useState<"white" | "fluor" | "nir">("white")
   const today = reading.date === CLINIC_DAY && reading.source === "device"
+  const tissueLead = (
+    [
+      ["granulation", reading.tissue.granulation],
+      ["slough", reading.tissue.slough],
+      ["necrotic", reading.tissue.necrotic],
+      ["epithelial", reading.tissue.epithelial],
+    ] as const
+  ).reduce((lead, part) => (part[1] > lead[1] ? part : lead))
 
   return (
     <section className="chart">
@@ -55,19 +58,13 @@ export function Chart({
         </div>
         <div className="head-actions">
           <button className="btn ghost" type="button" onClick={onAcquire}>
-            {today ? "Repeat reading" : "Acquire reading"}
+            {today ? "Repeat reading" : "New reading"}
           </button>
           <button className="btn solid" type="button" onClick={onGenerate}>
-            Generate treatment plan
+            Treatment plan
           </button>
         </div>
       </header>
-
-      <p className="action-note">
-        {hasKey
-          ? "The plan keeps these measurements. Gemini writes the treatment language."
-          : "No Gemini key yet. The plan will come from the measurement matrix, in the same clinician format."}
-      </p>
 
       <dl className="facts">
         <div>
@@ -94,7 +91,7 @@ export function Chart({
         </div>
         {(patient.hba1c || patient.recentGlucose) && (
           <div>
-            <dt>Glucose context</dt>
+            <dt>Glucose</dt>
             <dd>{[patient.hba1c && `HbA1c ${patient.hba1c}`, patient.recentGlucose].filter(Boolean).join(" · ")}</dd>
           </div>
         )}
@@ -104,14 +101,12 @@ export function Chart({
 
       {fresh && today && (
         <p className="banner" role="status">
-          Uploaded {fmtDate(reading.date)} from SP-1
-          {reading.qc ? ` · lot ${reading.qc.probeLot} · tip discarded after this cycle` : ""}. T90{" "}
-          {reading.qc?.t90Seconds.toFixed(1)} s.
+          Reading uploaded {fmtDate(reading.date)}.
         </p>
       )}
       {!today && (
         <p className="banner quiet">
-          No SP-1 upload for {fmtDate(CLINIC_DAY)}. The chart below is the {fmtDate(reading.date)} visit.
+          Showing the {fmtDate(reading.date)} visit. No reading yet today.
         </p>
       )}
 
@@ -128,113 +123,66 @@ export function Chart({
         </div>
       </div>
 
-      <h2 className="section-label">Biomarkers</h2>
-      <div className="tiles tiles-bio">
-        <article>
-          <p>Biofilm</p>
-          <strong>{reading.biofilm === "present" ? "Present" : "Absent"}</strong>
-          <span>{reading.biofilm === "present" ? "■ Present" : "✓ Absent"} · not on the image</span>
-        </article>
-        <article>
-          <p>Diversity</p>
-          <strong>{reading.speciesCount}</strong>
-          <span>
-            {call.diversity === "low" ? "■ Low diversity" : call.diversity === "borderline" ? "● Borderline" : "✓ None dominating"}
-          </span>
-        </article>
-        <article>
-          <p>Protease</p>
-          <strong>{reading.proteaseIndex}</strong>
-          <span>{call.protease === "elevated" ? "■ Elevated" : "✓ Not elevated"} · index</span>
-        </article>
-        <article>
-          <p>Uric acid</p>
-          <strong>{reading.uricAcidRelative.toFixed(1)}</strong>
-          <span>{call.uric === "elevated" ? "■ Elevated" : call.uric === "borderline" ? "● Borderline" : "✓ Lower band"} · relative</span>
-        </article>
-        <article>
-          <p>Inflammation</p>
-          <strong>{reading.inflammation === "persistent" ? "Persistent" : "Resolving"}</strong>
-          <span>{reading.inflammation === "persistent" ? "■ Persistent" : "✓ Resolving"} · pattern</span>
-        </article>
-        <article>
-          <p>pH</p>
-          <strong>{fmtPh(reading.ph)}</strong>
-          <span>{call.phCall === "healing" ? "✓ Healing range" : call.phCall === "alkaline" ? "■ Barrier" : call.phCall === "transitional" ? "● Transitional" : "● Verify"}</span>
-        </article>
-        <article>
-          <p>Temperature delta</p>
-          <strong>{fmtDelta(call.deltaT)}</strong>
-          <span>
-            {fmtTemp(reading.periwoundTempC)} vs {fmtTemp(reading.referenceTempC)}
-          </span>
-        </article>
-      </div>
-
-      <h2 className="section-label">Acquisition</h2>
       <div className="tiles">
         <article>
-          <p>pH</p>
-          <strong>{fmtPh(reading.ph)}</strong>
-          <span>{call.phCall === "healing" ? "✓ Healing range" : call.phCall === "alkaline" ? "■ Barrier" : call.phCall === "transitional" ? "● Transitional" : "● Verify"}</span>
-        </article>
-        <article>
-          <p>Temperature delta</p>
+          <p>Temperature</p>
           <strong>{fmtDelta(call.deltaT)}</strong>
           <span>
             {fmtTemp(reading.periwoundTempC)} vs {fmtTemp(reading.referenceTempC)}
+          </span>
+        </article>
+        <article>
+          <p>Fluorescence</p>
+          <strong>{reading.fluorescenceIndex.toFixed(0)}</strong>
+          <span>
+            {call.fluorCall === "bright" ? "■ Bright" : call.fluorCall === "signal" ? "● Signal" : "✓ Quiet"}
           </span>
         </article>
         <article>
           <p>Area</p>
           <strong>{reading.areaCm2.toFixed(1)}</strong>
-          <span>cm² · {reading.lengthCm.toFixed(1)} × {reading.widthCm.toFixed(1)} cm</span>
+          <span>
+            cm² · {reading.lengthCm.toFixed(1)} × {reading.widthCm.toFixed(1)} cm
+          </span>
+        </article>
+        <article className="tile-wide">
+          <p>Tissue</p>
+          <strong>
+            {tissueLead[1]}% {tissueLead[0]}
+          </strong>
+          <span>
+            {call.tissueBarrier ? "■ Nonviable" : "✓ Viable bed"} · granulation {reading.tissue.granulation}% · slough{" "}
+            {reading.tissue.slough}% · necrotic {reading.tissue.necrotic}% · epithelial {reading.tissue.epithelial}%
+          </span>
         </article>
         <article>
-          <p>Fluorescence</p>
-          <strong>{reading.fluorescenceIndex}</strong>
-          <span>{call.fluorCall === "high" ? "■ High signal" : call.fluorCall === "moderate" ? "● Moderate signal" : "✓ Low signal"}</span>
+          <p>Exudate</p>
+          <strong>{titleCase(reading.exudate)}</strong>
+          <span>
+            {call.moisture === "excess" ? "■ Excess" : call.moisture === "dry" ? "● Dry" : "✓ Balanced"} ·{" "}
+            {titleCase(reading.exudateCharacter)}
+          </span>
         </article>
         <article>
-          <p>Estimated StO2</p>
-          <strong>{reading.sto2}%</strong>
-          <span>{call.oxygenCall === "impaired" ? "■ Impaired" : call.oxygenCall === "borderline" ? "● Borderline" : "✓ Adequate"}</span>
-        </article>
-        <article>
-          <p>Pain NRS</p>
-          <strong>{reading.painNrs}</strong>
-          <span>{reading.painNrs >= 7 ? "■ Severe" : reading.painNrs >= 5 ? "● Needs a plan" : "✓ Tolerable"} · reported</span>
+          <p>Periwound</p>
+          <strong>{reading.periwound.length ? titleCase(reading.periwound[0]) : "Intact"}</strong>
+          <span>
+            {reading.periwound.length > 1
+              ? reading.periwound.slice(1).map(titleCase).join(", ")
+              : reading.periwound.length
+                ? "Skin around the wound"
+                : "No skin change"}
+          </span>
         </article>
       </div>
 
-      <div className="split">
-        <figure>
-          <div className="mode-switch" role="group" aria-label="Optical review">
-            {(
-              [
-                ["white", "White light"],
-                ["fluor", "Fluorescence"],
-                ["nir", "Perfusion"],
-              ] as const
-            ).map(([id, label]) => (
-              <button key={id} type="button" data-on={mode === id ? "yes" : "no"} onClick={() => setMode(id)}>
-                {label}
-              </button>
-            ))}
-          </div>
-          <WoundFigure assessment={reading} skin={patient.skin} mode={mode} />
-          <figcaption>
-            Optical schematic of the tissue fractions. Biofilm cannot be seen in this image.
-          </figcaption>
-        </figure>
-        <div className="trends">
-          <h2>Since the first visit on this chart</h2>
+      <div className="trends">
+          <h2>Trend</h2>
           {(
             [
-              ["pH", patient.history.map((item) => item.ph), fmtPh(reading.ph)],
-              ["Protease", patient.history.map((item) => item.proteaseIndex), String(reading.proteaseIndex)],
-              ["Uric acid", patient.history.map((item) => item.uricAcidRelative), reading.uricAcidRelative.toFixed(1)],
-              ["Species", patient.history.map((item) => item.speciesCount), String(reading.speciesCount)],
+              ["Temperature", patient.history.map((item) => deltaT(item)), fmtDelta(call.deltaT)],
+              ["Fluorescence", patient.history.map((item) => item.fluorescenceIndex), reading.fluorescenceIndex.toFixed(0)],
+              ["Area", patient.history.map((item) => item.areaCm2), reading.areaCm2.toFixed(1)],
             ] as const
           ).map(([label, values, current]) => (
             <div key={label} className="trend">
@@ -245,7 +193,6 @@ export function Chart({
               <Spark values={[...values]} />
             </div>
           ))}
-        </div>
       </div>
 
       <div className="table-scroll">
@@ -254,33 +201,30 @@ export function Chart({
           <thead>
             <tr>
               <th>Date</th>
-              <th>Biofilm</th>
-              <th>Species</th>
-              <th>Protease</th>
-              <th>Uric acid</th>
-              <th>Inflammation</th>
-              <th>pH</th>
               <th>Delta</th>
-              <th>Area</th>
               <th>Fluorescence</th>
+              <th>Area</th>
+              <th>Exudate</th>
+              <th>Granulation</th>
+              <th>Slough</th>
+              <th>Necrotic</th>
+              <th>Periwound</th>
             </tr>
           </thead>
           <tbody>
             {[...patient.history].reverse().map((item) => (
               <tr key={item.id} data-today={item.date === CLINIC_DAY ? "yes" : "no"}>
-                <td>{fmtDate(item.date)}{item.source === "device" ? " · SP-1" : ""}</td>
-                <td>{item.biofilm === "present" ? "Present" : "Absent"}</td>
-                <td>
-                  {item.speciesCount}
-                  {item.dominantCount ? ` · ${item.dominantCount} dominating` : ""}
-                </td>
-                <td>{item.proteaseIndex}</td>
-                <td>{item.uricAcidRelative.toFixed(1)}</td>
-                <td>{item.inflammation === "persistent" ? "Persistent" : "Resolving"}</td>
-                <td>{fmtPh(item.ph)}</td>
+                <td>{fmtDate(item.date)}{item.source === "device" ? " · uploaded" : ""}</td>
                 <td>{fmtDelta(deltaT(item))}</td>
+                <td>{item.fluorescenceIndex.toFixed(0)}</td>
                 <td>{item.areaCm2.toFixed(1)} cm²</td>
-                <td>{item.fluorescenceIndex}</td>
+                <td>
+                  {item.exudate}, {item.exudateCharacter}
+                </td>
+                <td>{item.tissue.granulation}%</td>
+                <td>{item.tissue.slough}%</td>
+                <td>{item.tissue.necrotic}%</td>
+                <td>{item.periwound.length ? item.periwound.map(titleCase).join(", ") : "Intact"}</td>
               </tr>
             ))}
           </tbody>

@@ -2,16 +2,16 @@ import { PATIENTS } from "./data/patients"
 import { buildPlan, interpret } from "./lib/clinical"
 
 const expected: Record<string, [string, string]> = {
-  elena: ["escalate", "Biofilm barrier"],
-  samuel: ["escalate", "Biofilm barrier"],
+  elena: ["escalate", "Bioburden and thermal barrier"],
+  samuel: ["escalate", "Bioburden and thermal barrier"],
   robert: ["escalate", "Perfusion barrier"],
-  james: ["watch", "Biofilm barrier"],
-  diego: ["watch", "Biofilm barrier"],
-  aisha: ["watch", "Biofilm barrier"],
-  walter: ["watch", "Healing milieu with residual slough"],
+  james: ["watch", "Nonviable tissue barrier"],
+  diego: ["watch", "Nonviable tissue barrier"],
+  aisha: ["watch", "Residual slough"],
+  walter: ["watch", "Residual slough"],
   priya: ["stable", "Healing trajectory"],
   mei: ["stable", "Healing trajectory"],
-  helen: ["stable", "Approaching the healing pH band"],
+  helen: ["stable", "Healing trajectory"],
 }
 
 let failed = 0
@@ -27,9 +27,11 @@ for (const patient of PATIENTS) {
     if (/do not start/i.test(order.action)) return false
     return /\b(start|prescribe|initiate|begin)\b/i.test(order.action) && /allopurinol|bacteriophage|probiotic/i.test(order.action)
   })
-  const biofilmOrder = plan.orders.some((order) => order.domain === "Biofilm")
-  const biofilmOk = patient.pending.biofilm === "absent" || biofilmOrder
-  if (!ok || !safety || banned || !biofilmOk) failed += 1
+  const strip = /\bpH\b|\bbiofilm\b|\bprotease\b|\buric acid\b|\ballopurinol\b|\bassay\b/i.test(
+    `${plan.clinicalSummary} ${plan.trendReading} ${blob} ${plan.avoid.join(" ")}`,
+  )
+  if (!ok || !safety || banned || strip) failed += 1
+  if (strip) console.log("  plan still mentions a strip result")
   console.log(
     `${ok && safety ? "ok" : "FAIL"}  ${patient.name.padEnd(18)} ${call.acuity.padEnd(9)} ${call.primaryBarrier}  ·  ${plan.headline}`,
   )

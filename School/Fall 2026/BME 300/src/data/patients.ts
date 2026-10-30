@@ -128,7 +128,7 @@ export const PATIENTS: Patient[] = [
     compressionSafe: true,
     etiologyKey: "dehiscence",
     mechanical: "Abdominal binder for comfort only",
-    chartNote: "General surgery saw him last visit. No systemic antibiotic is documented in this demo record.",
+    chartNote: "General surgery saw him last visit. No systemic antibiotic is documented.",
     skin: "#8a5a3c",
     wound: {
       etiology: "Surgical dehiscence",
@@ -298,7 +298,7 @@ export const PATIENTS: Patient[] = [
     compressionSafe: true,
     etiologyKey: "dfu",
     mechanical: "Offloading boot used about half of days",
-    chartNote: "Area had been falling. The last visits flattened, and pH has climbed out of the healing band.",
+    chartNote: "Area had been falling. The last visits flattened, and the periwound has warmed.",
     skin: "#d7a67a",
     wound: {
       etiology: "Diabetic foot ulcer",
@@ -341,7 +341,7 @@ export const PATIENTS: Patient[] = [
     compressionSafe: true,
     etiologyKey: "vlu",
     mechanical: "Compression hosiery in place",
-    chartNote: "Long-standing ulcer. Pain is his main complaint. Biochemistry has looked like a healing bed.",
+    chartNote: "Long-standing ulcer. The bed is mostly granulation, with residual slough.",
     skin: "#efc7a4",
     wound: {
       etiology: "Venous leg ulcer",

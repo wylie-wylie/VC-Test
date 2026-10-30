@@ -157,4 +157,4 @@ export const MATRIX: MatrixRow[] = [
 ]
 
 export const MATRIX_NOTE =
-  "pH and temperature are the baseline channels in the team PDS dated 17 Sep 2026. Temperature is compared with contralateral skin. The PDS also describes infection and ischemia against core temperature, which this cycle does not measure. Biofilm, diversity, protease, uric acid, and inflammation are literature rows. Protease uses one published assay idea, not a universal cutoff. Uric acid is a relative wound-fluid index because that literature did not establish a µmol/L reference interval. Biofilm cannot be seen with the naked eye."
+  "Temperature is compared with contralateral intact skin. Core temperature is not measured on this cycle. The protease cut is assay-specific, not a universal threshold. Uric acid is a relative wound-fluid index, not a µmol/L lab range. Biofilm cannot be seen with the naked eye."
